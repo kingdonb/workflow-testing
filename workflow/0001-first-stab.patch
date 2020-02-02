@@ -1,0 +1,264 @@
+From 1ba89d279c51a01b805a53c89b3fd2476c87ea06 Mon Sep 17 00:00:00 2001
+From: Kingdon B <kingdon@teamhephy.com>
+Date: Sun, 27 Oct 2019 03:14:06 +0000
+Subject: [PATCH] first stab
+
+---
+ workflow/charts/builder/templates/builder-deployment.yaml | 2 +-
+ .../controller/templates/controller-clusterrole.yaml      | 4 ++--
+ .../controller/templates/controller-deployment.yaml       | 2 +-
+ .../templates/controller-ingress-rule-http-80.yaml        | 2 +-
+ .../charts/database/templates/database-deployment.yaml    | 2 +-
+ .../charts/fluentd/templates/logger-fluentd-daemon.yaml   | 2 +-
+ workflow/charts/logger/templates/logger-deployment.yaml   | 2 +-
+ workflow/charts/minio/templates/minio-deployment.yaml     | 2 +-
+ .../grafana/templates/monitor-grafana-deployment.yaml     | 2 +-
+ .../influxdb/templates/monitor-influxdb-deployment.yaml   | 2 +-
+ .../telegraf/templates/monitor-telegraf-daemon.yaml       | 8 +++++++-
+ workflow/charts/nsqd/templates/nsqd-deployment.yaml       | 2 +-
+ .../charts/redis/templates/logger-redis-deployment.yaml   | 2 +-
+ .../registry-proxy/templates/registry-proxy-daemon.yaml   | 2 +-
+ .../templates/registry-token-refresher-deployment.yaml    | 2 +-
+ .../charts/registry/templates/registry-deployment.yaml    | 2 +-
+ workflow/charts/router/templates/router-deployment.yaml   | 2 +-
+ .../templates/workflow-manager-deployment.yaml            | 2 +-
+ workflow/values.yaml                                      | 7 +++++++
+ 19 files changed, 32 insertions(+), 19 deletions(-)
+
+diff --git a/workflow/charts/builder/templates/builder-deployment.yaml b/workflow/charts/builder/templates/builder-deployment.yaml
+index e525fb6..66ea22f 100644
+--- a/workflow/charts/builder/templates/builder-deployment.yaml
++++ b/workflow/charts/builder/templates/builder-deployment.yaml
+@@ -1,4 +1,4 @@
+-apiVersion: extensions/v1beta1
++apiVersion: {{ .Values.global.api_group }}
+ kind: Deployment
+ metadata:
+   name: deis-builder
+diff --git a/workflow/charts/controller/templates/controller-clusterrole.yaml b/workflow/charts/controller/templates/controller-clusterrole.yaml
+index 53c934d..da60d74 100644
+--- a/workflow/charts/controller/templates/controller-clusterrole.yaml
++++ b/workflow/charts/controller/templates/controller-clusterrole.yaml
+@@ -38,13 +38,13 @@ rules:
+ - apiGroups: [""]
+   resources: ["resourcequotas"]
+   verbs: ["get", "create"]
+-- apiGroups: ["extensions"]
++- apiGroups: ["extensions", "apps"]
+   resources: ["replicasets"]
+   verbs: ["get", "list", "delete", "update"]
+ - apiGroups: ["extensions", "apps"]
+   resources: ["deployments"]
+   verbs: ["get", "list", "create", "update", "delete"]
+-- apiGroups: ["extensions"]
++- apiGroups: ["extensions", "apps"]
+   resources: ["deployments/scale", "replicasets/scale"]
+   verbs: ["get", "update"]
+ - apiGroups: ["extensions", "autoscaling"]
+diff --git a/workflow/charts/controller/templates/controller-deployment.yaml b/workflow/charts/controller/templates/controller-deployment.yaml
+index ae10514..c3f9ce8 100644
+--- a/workflow/charts/controller/templates/controller-deployment.yaml
++++ b/workflow/charts/controller/templates/controller-deployment.yaml
+@@ -1,4 +1,4 @@
+-apiVersion: extensions/v1beta1
++apiVersion: {{ .Values.global.api_group }}
+ kind: Deployment
+ metadata:
+   name: deis-controller
+diff --git a/workflow/charts/controller/templates/controller-ingress-rule-http-80.yaml b/workflow/charts/controller/templates/controller-ingress-rule-http-80.yaml
+index 509eca5..34ef1a1 100644
+--- a/workflow/charts/controller/templates/controller-ingress-rule-http-80.yaml
++++ b/workflow/charts/controller/templates/controller-ingress-rule-http-80.yaml
+@@ -1,5 +1,5 @@
+ {{ if .Values.global.experimental_native_ingress }}
+-apiVersion: extensions/v1beta1
++apiVersion: {{ .Values.global.api_group }}
+ kind: Ingress
+ metadata:
+   namespace: "{{ .Release.Namespace }}"
+diff --git a/workflow/charts/database/templates/database-deployment.yaml b/workflow/charts/database/templates/database-deployment.yaml
+index 0c6a214..0597cc3 100644
+--- a/workflow/charts/database/templates/database-deployment.yaml
++++ b/workflow/charts/database/templates/database-deployment.yaml
+@@ -1,5 +1,5 @@
+ {{- if eq .Values.global.database_location "on-cluster" }}
+-apiVersion: extensions/v1beta1
++apiVersion: {{ .Values.global.api_group }}
+ kind: Deployment
+ metadata:
+   name: deis-database
+diff --git a/workflow/charts/fluentd/templates/logger-fluentd-daemon.yaml b/workflow/charts/fluentd/templates/logger-fluentd-daemon.yaml
+index c5a7bb6..76d443c 100644
+--- a/workflow/charts/fluentd/templates/logger-fluentd-daemon.yaml
++++ b/workflow/charts/fluentd/templates/logger-fluentd-daemon.yaml
+@@ -1,4 +1,4 @@
+-apiVersion: extensions/v1beta1
++apiVersion: {{ .Values.global.api_group }}
+ kind: DaemonSet
+ metadata:
+   name: deis-logger-fluentd
+diff --git a/workflow/charts/logger/templates/logger-deployment.yaml b/workflow/charts/logger/templates/logger-deployment.yaml
+index 810c778..0491828 100644
+--- a/workflow/charts/logger/templates/logger-deployment.yaml
++++ b/workflow/charts/logger/templates/logger-deployment.yaml
+@@ -1,4 +1,4 @@
+-apiVersion: extensions/v1beta1
++apiVersion: {{ .Values.global.api_group }}
+ kind: Deployment
+ metadata:
+   name: deis-logger
+diff --git a/workflow/charts/minio/templates/minio-deployment.yaml b/workflow/charts/minio/templates/minio-deployment.yaml
+index a0bb4d9..62e31c0 100644
+--- a/workflow/charts/minio/templates/minio-deployment.yaml
++++ b/workflow/charts/minio/templates/minio-deployment.yaml
+@@ -1,5 +1,5 @@
+ {{- if eq .Values.global.storage "minio" }}
+-apiVersion: extensions/v1beta1
++apiVersion: {{ .Values.global.api_group }}
+ kind: Deployment
+ metadata:
+   name: deis-minio
+diff --git a/workflow/charts/monitor/charts/grafana/templates/monitor-grafana-deployment.yaml b/workflow/charts/monitor/charts/grafana/templates/monitor-grafana-deployment.yaml
+index 6c96c5e..63948ec 100644
+--- a/workflow/charts/monitor/charts/grafana/templates/monitor-grafana-deployment.yaml
++++ b/workflow/charts/monitor/charts/grafana/templates/monitor-grafana-deployment.yaml
+@@ -1,5 +1,5 @@
+ {{- if eq .Values.global.grafana_location "on-cluster" }}
+-apiVersion: extensions/v1beta1
++apiVersion: {{ .Values.global.api_group }}
+ kind: Deployment
+ metadata:
+   name: deis-monitor-grafana
+diff --git a/workflow/charts/monitor/charts/influxdb/templates/monitor-influxdb-deployment.yaml b/workflow/charts/monitor/charts/influxdb/templates/monitor-influxdb-deployment.yaml
+index 25802c6..9ab61c5 100644
+--- a/workflow/charts/monitor/charts/influxdb/templates/monitor-influxdb-deployment.yaml
++++ b/workflow/charts/monitor/charts/influxdb/templates/monitor-influxdb-deployment.yaml
+@@ -1,5 +1,5 @@
+ {{- if eq .Values.global.influxdb_location "on-cluster" }}
+-apiVersion: extensions/v1beta1
++apiVersion: {{ .Values.global.api_group }}
+ kind: Deployment
+ metadata:
+   name: deis-monitor-influxdb
+diff --git a/workflow/charts/monitor/charts/telegraf/templates/monitor-telegraf-daemon.yaml b/workflow/charts/monitor/charts/telegraf/templates/monitor-telegraf-daemon.yaml
+index 8820d26..961c406 100644
+--- a/workflow/charts/monitor/charts/telegraf/templates/monitor-telegraf-daemon.yaml
++++ b/workflow/charts/monitor/charts/telegraf/templates/monitor-telegraf-daemon.yaml
+@@ -1,4 +1,4 @@
+-apiVersion: extensions/v1beta1
++apiVersion: {{ .Values.global.api_group }}
+ kind: DaemonSet
+ metadata:
+   name: deis-monitor-telegraf
+@@ -11,9 +11,15 @@ spec:
+   updateStrategy:
+     type: RollingUpdate
+   {{- end }}
++  selector:
++    matchLabels:
++      app: deis-monitor-telegraf
++      heritage: deis
+   template:
+     metadata:
++      name: deis-monitor-telegraf
+       labels:
++        heritage: deis
+         app: deis-monitor-telegraf
+     spec:
+       serviceAccount: deis-monitor-telegraf
+diff --git a/workflow/charts/nsqd/templates/nsqd-deployment.yaml b/workflow/charts/nsqd/templates/nsqd-deployment.yaml
+index c78ad8e..908ae37 100644
+--- a/workflow/charts/nsqd/templates/nsqd-deployment.yaml
++++ b/workflow/charts/nsqd/templates/nsqd-deployment.yaml
+@@ -1,4 +1,4 @@
+-apiVersion: extensions/v1beta1
++apiVersion: {{ .Values.global.api_group }}
+ kind: Deployment
+ metadata:
+   name: deis-nsqd
+diff --git a/workflow/charts/redis/templates/logger-redis-deployment.yaml b/workflow/charts/redis/templates/logger-redis-deployment.yaml
+index 882246d..c9e9e46 100644
+--- a/workflow/charts/redis/templates/logger-redis-deployment.yaml
++++ b/workflow/charts/redis/templates/logger-redis-deployment.yaml
+@@ -1,5 +1,5 @@
+ {{- if eq .Values.global.logger_redis_location "on-cluster" }}
+-apiVersion: extensions/v1beta1
++apiVersion: {{ .Values.global.api_group }}
+ kind: Deployment
+ metadata:
+   name: deis-logger-redis
+diff --git a/workflow/charts/registry-proxy/templates/registry-proxy-daemon.yaml b/workflow/charts/registry-proxy/templates/registry-proxy-daemon.yaml
+index 3b22fdd..e9b31eb 100644
+--- a/workflow/charts/registry-proxy/templates/registry-proxy-daemon.yaml
++++ b/workflow/charts/registry-proxy/templates/registry-proxy-daemon.yaml
+@@ -1,5 +1,5 @@
+ {{- if eq .Values.global.registry_location "on-cluster" }}
+-apiVersion: extensions/v1beta1
++apiVersion: {{ .Values.global.api_group }}
+ kind: DaemonSet
+ metadata:
+   name: deis-registry-proxy
+diff --git a/workflow/charts/registry-token-refresher/templates/registry-token-refresher-deployment.yaml b/workflow/charts/registry-token-refresher/templates/registry-token-refresher-deployment.yaml
+index f8ac63b..a960642 100644
+--- a/workflow/charts/registry-token-refresher/templates/registry-token-refresher-deployment.yaml
++++ b/workflow/charts/registry-token-refresher/templates/registry-token-refresher-deployment.yaml
+@@ -1,5 +1,5 @@
+ {{- if and (ne .Values.global.registry_location "on-cluster") (ne .Values.global.registry_location "off-cluster") }}
+-apiVersion: extensions/v1beta1
++apiVersion: {{ .Values.global.api_group }}
+ kind: Deployment
+ metadata:
+   name: deis-registry-token-refresher
+diff --git a/workflow/charts/registry/templates/registry-deployment.yaml b/workflow/charts/registry/templates/registry-deployment.yaml
+index 3ce2292..e4a77cb 100644
+--- a/workflow/charts/registry/templates/registry-deployment.yaml
++++ b/workflow/charts/registry/templates/registry-deployment.yaml
+@@ -1,5 +1,5 @@
+ {{- if eq .Values.global.registry_location "on-cluster" }}
+-apiVersion: extensions/v1beta1
++apiVersion: {{ .Values.global.api_group }}
+ kind: Deployment
+ metadata:
+   name: deis-registry
+diff --git a/workflow/charts/router/templates/router-deployment.yaml b/workflow/charts/router/templates/router-deployment.yaml
+index c94f570..5ac4331 100644
+--- a/workflow/charts/router/templates/router-deployment.yaml
++++ b/workflow/charts/router/templates/router-deployment.yaml
+@@ -1,5 +1,5 @@
+ {{- if not .Values.global.experimental_native_ingress }}
+-apiVersion: extensions/v1beta1
++apiVersion: {{ .Values.global.api_group }}
+ kind: Deployment
+ metadata:
+   name: deis-router
+diff --git a/workflow/charts/workflow-manager/templates/workflow-manager-deployment.yaml b/workflow/charts/workflow-manager/templates/workflow-manager-deployment.yaml
+index 1a59b00..79c766f 100644
+--- a/workflow/charts/workflow-manager/templates/workflow-manager-deployment.yaml
++++ b/workflow/charts/workflow-manager/templates/workflow-manager-deployment.yaml
+@@ -1,4 +1,4 @@
+-apiVersion: extensions/v1beta1
++apiVersion: {{ .Values.global.api_group }}
+ kind: Deployment
+ metadata:
+   name: deis-workflow-manager
+diff --git a/workflow/values.yaml b/workflow/values.yaml
+index 2bb44af..ed0a19e 100644
+--- a/workflow/values.yaml
++++ b/workflow/values.yaml
+@@ -75,6 +75,13 @@ global:
+   # - false: no RBAC-related manifests will be installed
+   use_rbac: false
+ 
++  # Select API groups to use in component charts
++  #
++  # Valid values are:
++  # - apps/v1: for K8s version 1.16+ the older API group was removed, now apps/v1 is used
++  # - extensions/v1beta1: on K8s <1.12, v1 API group is not available, use this instead
++  api_group: apps/v1
++
+ 
+ s3:
+   # Your AWS access key. Leave it empty if you want to use IAM credentials.
+-- 
+2.17.1
+
