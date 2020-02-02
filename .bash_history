@@ -339,3 +339,32 @@ cd git
 ls
 cp ../.bash_history ./
 tail .bash_history 
+cd git
+cp ../.bash_history ./
+tail .bash_history 
+wc -l .bash_history
+git co master
+git add .bash_history 
+git commit -vn
+git push -u origin master 
+kg po
+kubectl version
+kubectl get --all-namespaces ingress
+kg po
+alias kg='kubectl get --all-namespaces'
+kg po
+alias kd='kubectl -n deis'
+kd logs -f slugbuild-go-1d382ccf-40516258
+kd logs -f slugbuild-rocksolidapp-2a2d3050-cba6204c
+ls
+ls git
+kg po
+deis
+kg ing
+kg deploy
+kd get po
+kd logs -f slugbuild-rocksolidapp-2a2d3050-cba6204c
+kd get po
+kg po
+kg ing
+kd get po
